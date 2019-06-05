@@ -1,6 +1,6 @@
 # vim: expandtab:ts=4:sw=4
-
-
+import numpy as np
+from viterbi import Viterbi
 class TrackState:
     """
     Enumeration type for the single target track state. Newly created tracks are
@@ -15,6 +15,17 @@ class TrackState:
     Confirmed = 2
     Deleted = 3
 
+class Label:
+    def __init__(self, label, max_classnum):
+        self.max_classnum = max_classnum
+        self.label_counts = [0] * self.max_classnum
+        self.label_counts[label] += 1
+
+    def update(self, label):
+        self.label_counts[label] += 1
+    
+    def get(self):
+        return self.label_counts.index(max(self.label_counts))
 
 class Track:
     """
@@ -64,7 +75,7 @@ class Track:
     """
 
     def __init__(self, mean, covariance, track_id, n_init, max_age,
-                 feature=None):
+                 label, feature=None):
         self.mean = mean
         self.covariance = covariance
         self.track_id = track_id
@@ -76,6 +87,7 @@ class Track:
         self.features = []
         if feature is not None:
             self.features.append(feature)
+        self.label = Label(label, 2)
 
         self._n_init = n_init
         self._max_age = max_age
@@ -135,8 +147,10 @@ class Track:
             The associated detection.
 
         """
+        xyah = detection.to_xyah()
         self.mean, self.covariance = kf.update(
-            self.mean, self.covariance, detection.to_xyah())
+                self.mean, self.covariance, xyah)
+        self.label.update(detection.label)
         self.features.append(detection.feature)
 
         self.hits += 1
