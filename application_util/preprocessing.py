@@ -3,7 +3,7 @@ import numpy as np
 import cv2
 
 
-def non_max_suppression(boxes, max_bbox_overlap, scores=None):
+def non_max_suppression(boxes, max_bbox_overlap, labels):
     """Suppress overlapping detections.
 
     Original code from [1]_ has been adapted to include confidence score.
@@ -25,8 +25,8 @@ def non_max_suppression(boxes, max_bbox_overlap, scores=None):
         Array of ROIs (x, y, width, height).
     max_bbox_overlap : float
         ROIs that overlap more than this values are suppressed.
-    scores : Optional[array_like]
-        Detector confidence score.
+    labels : Optional[array_like]
+        Detector confidence score and predicted classes.
 
     Returns
     -------
@@ -46,8 +46,8 @@ def non_max_suppression(boxes, max_bbox_overlap, scores=None):
     y2 = boxes[:, 3] + boxes[:, 1]
 
     area = (x2 - x1 + 1) * (y2 - y1 + 1)
-    if scores is not None:
-        idxs = np.argsort(scores)
+    if labels is not None:
+        idxs = np.argsort([l.score for l in labels])
     else:
         idxs = np.argsort(y2)
 

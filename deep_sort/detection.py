@@ -10,25 +10,24 @@ class Detection(object):
     ----------
     tlwh : array_like
         Bounding box in format `(x, y, w, h)`.
-    confidence : float
-        Detector confidence score.
     feature : array_like
         A feature vector that describes the object contained in this image.
+    label  : array_like
+        Label class instance which contains predicted class labels and score.
 
     Attributes
     ----------
     tlwh : ndarray
         Bounding box in format `(top left x, top left y, width, height)`.
-    confidence : ndarray
-        Detector confidence score.
     feature : ndarray | NoneType
         A feature vector that describes the object contained in this image.
+    label  : array_like
+        Label class instance which contains predicted class labels and score.
 
     """
 
-    def __init__(self, tlwh, confidence, feature, label):
+    def __init__(self, tlwh, feature, label):
         self.tlwh = np.asarray(tlwh, dtype=np.float)
-        self.confidence = float(confidence)
         self.feature = np.asarray(feature, dtype=np.float32)
         self.label = label
 
